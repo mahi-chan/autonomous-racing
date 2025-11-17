@@ -123,14 +123,13 @@ class F1RacingEnv(gym.Env):
         """Define observation and action spaces."""
 
         # === ACTION SPACE ===
-        self.action_space = spaces.Dict({
-            'throttle': spaces.Box(low=0.0, high=1.0, shape=(), dtype=np.float32),
-            'brake': spaces.Box(low=0.0, high=1.0, shape=(), dtype=np.float32),
-            'steering': spaces.Box(low=-1.0, high=1.0, shape=(), dtype=np.float32),
-            'gear': spaces.Discrete(9),  # 0=neutral, 1-8=gears
-            'ers_mode': spaces.Box(low=-1.0, high=1.0, shape=(), dtype=np.float32),
-            'drs': spaces.Discrete(2),  # 0=off, 1=on
-        })
+        # Use Box space (6-dimensional) for compatibility with standard RL algorithms
+        # [throttle, brake, steering, gear_normalized, ers_mode, drs_normalized]
+        self.action_space = spaces.Box(
+            low=np.array([0.0, 0.0, -1.0, 0.0, -1.0, 0.0], dtype=np.float32),
+            high=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], dtype=np.float32),
+            dtype=np.float32
+        )
 
         # === OBSERVATION SPACE ===
         # We'll use a flattened observation for easier use with standard RL algorithms
@@ -229,26 +228,29 @@ class F1RacingEnv(gym.Env):
 
     def step(
         self,
-        action: Dict[str, float]
+        action: np.ndarray
     ) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
         """
         Execute one environment step.
 
         Args:
-            action: Dictionary with control inputs
+            action: Action array [throttle, brake, steering, gear_norm, ers_mode, drs_norm]
 
         Returns:
             (observation, reward, terminated, truncated, info)
         """
         self.step_count += 1
 
-        # Extract actions
-        throttle = float(action['throttle'])
-        brake = float(action['brake'])
-        steering = float(action['steering'])
-        gear = int(action['gear'])
-        ers_mode = float(action['ers_mode'])
-        drs_request = bool(action['drs'])
+        # Convert array action to components
+        # action: [throttle, brake, steering, gear_normalized, ers_mode, drs_normalized]
+        throttle = np.clip(float(action[0]), 0.0, 1.0)
+        brake = np.clip(float(action[1]), 0.0, 1.0)
+        steering = np.clip(float(action[2]), -1.0, 1.0)
+        gear_normalized = np.clip(float(action[3]), 0.0, 1.0)
+        gear = int(gear_normalized * 8)  # Scale to 0-8
+        ers_mode = np.clip(float(action[4]), -1.0, 1.0)
+        drs_normalized = np.clip(float(action[5]), 0.0, 1.0)
+        drs_request = bool(drs_normalized > 0.5)
 
         # Check if DRS is available
         segment = self.circuit.get_segment_at_distance(self.total_distance)

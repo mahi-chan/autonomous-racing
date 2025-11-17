@@ -2,6 +2,16 @@
 
 A state-of-the-art reinforcement learning system designed for F1 racing optimization, enabling teams to find optimal racing lines, braking points, gear selection, and speed profiles for any circuit configuration.
 
+## 🚀 Version 1.1.0 - Production Ready
+
+**Critical Fixes Applied**:
+- ✅ Fixed action space (now compatible with all standard RL algorithms)
+- ✅ Added domain randomization for robust sim-to-real transfer
+- ✅ Implemented opponent AI system
+- ✅ Comprehensive integration tests
+
+📖 See [CRITICAL_FIXES.md](CRITICAL_FIXES.md) for complete details.
+
 ## Overview
 
 This system simulates F1 cars with realistic physics and allows training RL agents to optimize racing performance. Built for F1 team engineers to test car configurations and racing strategies.
