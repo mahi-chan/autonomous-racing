@@ -1,0 +1,83 @@
+# F1 2024 Car Configuration
+# Default setup for modern F1 cars
+
+circuit: silverstone
+tire_compound: C3  # Medium compound
+
+# Car specifications (2024 regulations)
+car:
+  min_weight: 798.0  # kg (with driver)
+  weight_distribution_front: 0.46
+  wheelbase: 3.6  # meters
+  track_width_front: 1.6
+  track_width_rear: 1.55
+  center_of_gravity_height: 0.30
+
+  # Aerodynamics
+  frontal_area: 1.4
+  drag_coefficient: 0.70
+  downforce_coefficient: 3.5
+  aero_balance_front: 0.38
+  drs_available: true
+
+  # Power unit
+  max_power_ice: 550000.0  # 550 kW
+  max_power_ers_deploy: 120000.0  # 120 kW
+  ers_max_energy: 4000000.0  # 4 MJ per lap
+  max_fuel_load: 110.0  # kg
+
+  # Brakes
+  max_brake_force: 20000.0
+  brake_bias_front: 0.58
+
+  # Gear ratios (8-speed)
+  gear_ratios: [3.2, 2.4, 1.9, 1.5, 1.25, 1.05, 0.92, 0.82]
+  final_drive: 3.0
+
+# Reward weights for RL training
+reward_weights:
+  progress: 1.0
+  racing_line: 0.5
+  speed: 0.3
+  smoothness: 0.2
+  tire_management: 0.3
+  fuel_efficiency: 0.2
+  crash_penalty: -10.0
+  off_track_penalty: -1.0
+
+# SAC hyperparameters
+sac:
+  learning_rate: 0.0003
+  buffer_size: 1000000
+  learning_starts: 10000
+  batch_size: 256
+  tau: 0.005
+  gamma: 0.99
+  use_adaptive_temp: true
+
+# PPO-LSTM hyperparameters
+ppo_lstm:
+  learning_rate: 0.0003
+  n_steps: 2048
+  batch_size: 64
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  ent_coef: 0.01
+  lstm_hidden_size: 256
+  num_lstm_layers: 2
+
+# Model-based RL
+model_based:
+  latent_dim: 64
+  hidden_dim: 256
+  learning_rate: 0.0001
+  imagination_horizon: 15
+
+# Meta-RL
+meta_rl:
+  inner_lr: 0.01
+  outer_lr: 0.001
+  num_inner_steps: 5
+  task_embedding_dim: 32

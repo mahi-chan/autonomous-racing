@@ -1,0 +1,43 @@
+# Monaco Qualifying Setup
+# Maximum downforce configuration for Monaco
+
+circuit: monaco
+tire_compound: C5  # Softest compound for qualifying
+
+# Car configuration optimized for Monaco
+car:
+  min_weight: 798.0
+  weight_distribution_front: 0.47  # Slightly more front for low-speed corners
+
+  # Maximum downforce setup
+  frontal_area: 1.4
+  drag_coefficient: 0.85  # Higher due to max wing angles
+  downforce_coefficient: 4.2  # Maximum downforce
+  aero_balance_front: 0.42  # More front downforce for Monaco
+  drs_available: false  # Limited DRS zones in Monaco
+
+  # Power unit (same as standard)
+  max_power_ice: 550000.0
+  max_power_ers_deploy: 120000.0
+
+  # Brake setup for Monaco (heavy braking zones)
+  max_brake_force: 22000.0  # Higher braking force
+  brake_bias_front: 0.60  # More front bias
+
+# Reward weights adjusted for Monaco (precision over speed)
+reward_weights:
+  progress: 1.0
+  racing_line: 1.0  # Much more important in Monaco
+  speed: 0.2  # Less important
+  smoothness: 0.5  # Smoothness crucial
+  tire_management: 0.1  # Less critical in quali
+  fuel_efficiency: 0.0  # Not important in quali
+  crash_penalty: -20.0  # Barriers everywhere!
+  off_track_penalty: -5.0  # Very punishing
+
+# Training parameters
+sac:
+  learning_rate: 0.0001  # Lower LR for precision
+  buffer_size: 500000
+  batch_size: 128
+  use_adaptive_temp: true
