@@ -63,6 +63,10 @@ class F1RacingEnv(gym.Env):
         enable_dynamic_conditions: bool = True,
         tire_compound: TireCompound = TireCompound.C3,
         render_mode: Optional[str] = None,
+        # v1.2.0 Advanced Features
+        use_advanced_tire_model: bool = False,
+        use_advanced_aero: bool = False,
+        domain_randomization: Optional[str] = None,  # 'none', 'light', 'moderate', 'heavy'
     ):
         super().__init__()
 
@@ -70,11 +74,62 @@ class F1RacingEnv(gym.Env):
         self.circuit: Circuit = get_circuit(circuit_name)
         self.render_mode = render_mode
 
+        # Store advanced features flags
+        self.use_advanced_tire_model = use_advanced_tire_model
+        self.use_advanced_aero = use_advanced_aero
+
         # Initialize car systems
         self.car = F1Car(car_config or F1CarConfig())
-        self.tire_model = TireModel(tire_compound)
-        self.aero_model = AerodynamicsModel()
+
+        # Choose tire model (standard or advanced)
+        if use_advanced_tire_model:
+            try:
+                from src.physics.tire_model_advanced import AdvancedTireModel
+                # Convert TireCompound enum to string for advanced model
+                compound_map = {
+                    TireCompound.C1: "C1",
+                    TireCompound.C2: "C2",
+                    TireCompound.C3: "C3",
+                    TireCompound.C4: "C4",
+                    TireCompound.C5: "C5",
+                    TireCompound.INTERMEDIATE: "INTER",
+                    TireCompound.WET: "WET"
+                }
+                compound_str = compound_map.get(tire_compound, "C3")
+                self.tire_model = AdvancedTireModel(compound=compound_str)
+                print(f"✓ Using Advanced Tire Model (Pacejka MF 6.2) - Compound: {compound_str}")
+            except ImportError:
+                print("⚠ Advanced tire model not available, using standard model")
+                self.tire_model = TireModel(tire_compound)
+        else:
+            self.tire_model = TireModel(tire_compound)
+
+        # Choose aero model (standard or advanced)
+        if use_advanced_aero:
+            try:
+                from src.physics.aerodynamics_advanced import AdvancedAeroModel
+                self.aero_model = AdvancedAeroModel()
+                print("✓ Using Advanced Aero Model (CFD-based with ground effect)")
+            except ImportError:
+                print("⚠ Advanced aero model not available, using standard model")
+                self.aero_model = AerodynamicsModel()
+        else:
+            self.aero_model = AerodynamicsModel()
+
         self.power_unit = PowerUnit()
+
+        # Apply domain randomization wrapper if specified
+        self.domain_randomization = domain_randomization
+        if domain_randomization and domain_randomization != 'none':
+            try:
+                from src.envs.domain_randomization import DomainRandomizer
+                self.randomizer = DomainRandomizer(level=domain_randomization)
+                print(f"✓ Domain Randomization enabled: {domain_randomization}")
+            except ImportError:
+                print("⚠ Domain randomization not available")
+                self.randomizer = None
+        else:
+            self.randomizer = None
 
         # Dynamic conditions
         self.enable_dynamic_conditions = enable_dynamic_conditions

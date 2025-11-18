@@ -1,0 +1,67 @@
+# F1 Racing Simulation Configuration
+# ====================================
+# Edit this file to configure your simulation
+# Then run: python run_f1_simulation.py
+
+# === CIRCUIT SELECTION ===
+circuit: silverstone  # Options: silverstone, monaco, spa
+
+# === ADVANCED FEATURES (v1.2.0) ===
+use_advanced_tire_model: true   # Use Pacejka MF 6.2 with 120+ parameters
+use_advanced_aero: true          # Use CFD-based aerodynamics with ground effect
+domain_randomization: moderate   # Options: null, light, moderate, heavy (for sim-to-real transfer)
+
+# === TRAINING SETTINGS ===
+train_rl_agent: true             # Train new agent or use existing model?
+algorithm: sac                   # Options: sac (Soft Actor-Critic), ppo (PPO-LSTM)
+total_timesteps: 500000          # Training duration (500k = ~2-3 hours on GPU, 100k for quick test)
+save_model: true                 # Save trained model after training?
+
+# === CAR SETUPS TO TEST ===
+# The system will test each setup and compare lap times
+# Add/remove setups as needed
+car_setups:
+  - name: High_Downforce
+    tire_compound: SOFT          # Options: C1, C2, C3, C4, C5, SOFT, MEDIUM, HARD, INTER, WET
+    front_wing_angle: 15         # degrees (higher = more downforce)
+    rear_wing_angle: 12
+    ride_height_front: 25        # mm (lower = more downforce but risk porpoising)
+    ride_height_rear: 35
+    fuel_load: 110               # kg
+
+  - name: Balanced
+    tire_compound: MEDIUM
+    front_wing_angle: 11
+    rear_wing_angle: 9
+    ride_height_front: 30
+    ride_height_rear: 40
+    fuel_load: 110
+
+  - name: Low_Drag_Quali
+    tire_compound: SOFT
+    front_wing_angle: 8
+    rear_wing_angle: 6
+    ride_height_front: 35
+    ride_height_rear: 45
+    fuel_load: 30                # Light fuel for qualifying
+
+# === EVALUATION ===
+num_evaluation_laps: 5           # Number of laps to evaluate each setup
+compare_setups: true             # Generate comparison report and plots?
+
+# === VALIDATION (Optional) ===
+# Compare simulation with real F1 data
+validate_against_real_data: false
+real_data_path: data/real_f1_lap.csv
+real_lap_time: 85.093            # Reference lap time in seconds
+
+# === OUTPUT SETTINGS ===
+output_dir: results              # Where to save all results
+generate_visualizations: true    # Create plots and graphs?
+generate_report: true            # Create detailed text report?
+
+# === ADVANCED OPTIONS ===
+# Fine-tune the simulation (usually don't need to change)
+max_episode_time: 200.0          # Maximum time per episode (seconds)
+enable_dynamic_conditions: true  # Enable tire deg, fuel consumption, track evolution
+timestep: 0.02                   # Simulation timestep (seconds) - 0.02 = 50Hz
