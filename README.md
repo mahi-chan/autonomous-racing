@@ -73,12 +73,37 @@ This system simulates F1 cars with realistic physics and allows training RL agen
 
 ## Quick Start
 
-### Basic Training
+### 🌐 Run in Google Colab (No Installation!)
+
+**Fastest way to get started - runs in your browser!**
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yourusername/autonomous-racing/blob/main/F1_Racing_Colab.ipynb)
+
+- ✅ No setup required
+- ✅ Free GPU access
+- ✅ Test 5+ setups in 12 hours
+- ✅ Results auto-download
+
+📖 See [COLAB_GUIDE.md](COLAB_GUIDE.md) for details.
+
+### 💻 Run Locally (EASIEST)
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 pip install -e .
 
+# 2. Edit configuration
+nano config.yaml
+
+# 3. Run simulation
+python RUN_ME.py
+
+# That's it! Results in results/ directory
+```
+
+### 🔬 Advanced Usage
+
+```bash
 # Train an agent on Silverstone
 python scripts/train.py --circuit silverstone --algorithm sac --config configs/f1_2024.yaml
 
